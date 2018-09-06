@@ -190,7 +190,6 @@ public class Engine {
 		this.setStop(false);
 		int scale = 24 * 60 / 5;
 		start = 0;
-		boolean next = true;
 		long interval = 5 * 60 * 1000;
 		long begin = System.currentTimeMillis();
 		Iterator<Transaction> itr = this.transactions.iterator();

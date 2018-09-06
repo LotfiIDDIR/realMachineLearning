@@ -3,8 +3,6 @@ package fr.ensma.lias.bimedia2018machinelearning.preprocessing.controlers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import fr.ensma.lias.bimedia2018machinelearning.preprocessing.fileReadWrite.CSVUsage;
 import fr.ensma.lias.bimedia2018machinelearning.preprocessing.fileReadWrite.ICSVControl;
@@ -12,10 +10,8 @@ import fr.ensma.lias.bimedia2018machinelearning.preprocessing.model.OperationLin
 import fr.ensma.lias.bimedia2018machinelearning.preprocessing.model.Produit;
 import fr.ensma.lias.bimedia2018machinelearning.preprocessing.model.Ticket;
 
-
 /**
  * @author IDDIR Lotfi
- *
  */
 public class TicketControl implements ICSVControl {
 	private List<Ticket> ticketList;

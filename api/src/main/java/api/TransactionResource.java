@@ -29,5 +29,4 @@ public interface TransactionResource {
 	@GET
 	@Path("{date}")
 	List<TransactionDTO> getTransactionsByDate(@PathParam("date") String date);
-
 }

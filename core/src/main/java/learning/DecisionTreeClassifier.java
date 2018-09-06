@@ -58,10 +58,8 @@ public class DecisionTreeClassifier extends Classifier implements Serializable{
                     testData.mapToPair(p -> new Tuple2<>(model.predict(p.features()), p.label()));
             double testErr = predictionAndLabel.filter(pl -> !pl._1().equals(pl._2())).count() / (double) testData.count();
             this.setTestError(testErr);
-            String output = "tmp/myDecisionTreeClassificationModel"+System.currentTimeMillis();
-            //model.save(this.getJsc().sc(), output);
-          
-         
+            String output = "C:\\Users\\ASUS\\Desktop\\PFE\\Demo\\models\\decisionTree"+System.currentTimeMillis();
+            model.save(this.getJsc().sc(), output);
             MulticlassMetrics metrics= new   MulticlassMetrics(predictionAndLabel.rdd()); 
             this.setPrecision(metrics.precision(1.0));
             this.setRappel(metrics.recall(1.0));

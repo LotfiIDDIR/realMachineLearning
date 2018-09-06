@@ -59,7 +59,7 @@ public class RandomForestClassifier extends Classifier implements Serializable{
                 testData.mapToPair(p -> new Tuple2<>(model.predict(p.features()), p.label()));
 	    double testErr = predictionAndLabel.filter(pl -> !pl._1().equals(pl._2())).count() / (double) testData.count();
 	    this.setTestError(testErr);
-	    String output = "tmp/myRandomForestClassificationModel"+System.currentTimeMillis();
+	    String output = "C:\\Users\\ASUS\\Desktop\\PFE\\Demo\\models\\randomForest"+System.currentTimeMillis();
 	    this.getJsc().sc().hadoopConfiguration().set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
 	    this.getJsc().sc().hadoopConfiguration().set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
 	    model.save(this.getJsc().sc(), output);
@@ -80,5 +80,4 @@ public class RandomForestClassifier extends Classifier implements Serializable{
 		this.setModel(RandomForestModel
 		          .load(jsc.sc(), path));
 	}
-
 }

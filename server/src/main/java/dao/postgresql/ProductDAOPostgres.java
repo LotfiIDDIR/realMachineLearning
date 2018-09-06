@@ -1,21 +1,24 @@
 package fr.ensma.lias.bimedia2018machinelearning.dao.postgresql;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
 import fr.ensma.lias.bimedia2018machinelearning.dao.IProductDAO;
+import fr.ensma.lias.bimedia2018machinelearning.model.AssociationRule;
 import fr.ensma.lias.bimedia2018machinelearning.model.Product;
+import fr.ensma.lias.bimedia2018machinelearning.model.Result;
 
 /**
  * @author Lotfi IDDIR
@@ -68,8 +71,8 @@ public class ProductDAOPostgres implements IProductDAO {
 	public List<Product> getSuggestedProductsByPDV(int pdv, Set<String> inputProducts) {
 		Connection cnx = new SessionPostgres().getPostgresConnection();
 		List<Product> outList = new ArrayList<Product>();
+		List<Product> outList2 = new ArrayList<Product>();
 		final Set<String> allProducts = this.getAllProducts(pdv, inputProducts);
-		System.out.println(allProducts);
 		if (allProducts == null || allProducts.isEmpty()) {
 			return outList;
 		}
@@ -97,7 +100,7 @@ public class ProductDAOPostgres implements IProductDAO {
 				p.setDesignation(rs.getString("designation"));
 				p.setStockQuantity(rs.getInt("stockquantity"));
 				if (p.getStockQuantity() > 0 && !inputProducts.contains(p.getCode())) {
-					outList.add(p);
+					outList2.add(p);
 				}
 			}
 		} catch (SQLException e) {
@@ -105,20 +108,43 @@ public class ProductDAOPostgres implements IProductDAO {
 		} finally {
 			closeStatement(st);
 		}
-
+		for (String prod : allProducts)
+		{
+			outList.add(getProduct(prod,outList2));
+		}
 		return outList;
 	}
 
 	public Set<String> getAllProducts(int pdv, Set<String> products) {
 		Set<String> outList = new TreeSet<String>();
-		BufferedReader br = null;
-		FileReader fr = null;
-
-		try {
-			String folder = System.getProperty("user.dir");
-			fr = new FileReader(folder + "/src/main/resources/products/rules"+pdv+".txt");
-			br = new BufferedReader(fr);
-			String sCurrentLine;
+		String folder = System.getProperty("user.dir");
+		//fr = new FileReader(folder + "/src/main/resources/products/rules"+pdv+".json");
+		String path = folder + "/src/main/resources/products/rules/rules"+pdv+".json";
+		//br = new BufferedReader(fr);
+		Result result = new Result().readJson(path);
+    	java.util.Collections.sort(result.getRules());
+    	Map<String,Double>map = new HashMap<String,Double>();
+    	for(AssociationRule rule : result.getRules())
+    	{
+    		if(this.isAntecedent(rule.getAntecedent().toString(), products))
+    		{
+    			for (String line : rule.getConsequent()) {
+    				String out = "";
+					out = line.replace(" ", "");
+					out = line.replace("\"", "");
+					if(!(map.containsKey(out) && map.get(out)<rule.getConfidence()))
+						map.put(out, rule.getConfidence());
+				}
+    		}
+    	}
+    	List<Entry<String, Double>> list = new ArrayList<>(map.entrySet());
+        list.sort(Entry.comparingByValue());
+        Collections.reverse(list);
+        for (Entry<String, Double> entry : list) {
+            outList.add(entry.getKey());
+        }
+    	return outList;
+			/*String sCurrentLine;
 			while ((sCurrentLine = br.readLine()) != null) {
 				String[] sCurrentLineParts = sCurrentLine.split(";");
 				if (this.isAntecedent(sCurrentLineParts[0], products)) {
@@ -138,7 +164,6 @@ public class ProductDAOPostgres implements IProductDAO {
 				if (br != null) {
 					br.close();
 				}
-
 				if (fr != null) {
 					fr.close();
 				}
@@ -146,7 +171,7 @@ public class ProductDAOPostgres implements IProductDAO {
 				ex.printStackTrace();
 			}
 		}
-		return outList;
+		return outList;*/
 	}
 
 	public boolean isAntecedent(String line, Set<String> products) {
@@ -154,7 +179,6 @@ public class ProductDAOPostgres implements IProductDAO {
 		List<String> sublists = this.extractSubsets(products);
 		if (sublists.contains(line))
 			out = true;
-
 		return out;
 	}
 
@@ -167,10 +191,20 @@ public class ProductDAOPostgres implements IProductDAO {
 			for (int j = 0; j < n; j++)
 				if ((i & (1 << j)) > 0)
 					subset += productsList.get(j) + ", ";
-			if (subset.length() > 1)
+			if (subset.length() >1)
 				subset = subset.substring(0, subset.length() - 2);
 			subset += "]";
 			out.add(subset);
+		}
+		return out;
+	}
+	public Product getProduct(String code, List<Product>list)
+	{
+		Product out = null;
+		for (Product product : list)
+		{
+			if (product.getCode().equals(code))
+				out = product;
 		}
 		return out;
 	}

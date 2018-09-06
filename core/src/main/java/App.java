@@ -1,17 +1,10 @@
 package fr.ensma.lias.bimedia2018machinelearning;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -20,26 +13,17 @@ import org.apache.spark.mllib.fpm.AssociationRules;
 import org.apache.spark.mllib.fpm.FPGrowth;
 import org.apache.spark.mllib.fpm.FPGrowthModel;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-
 import fr.ensma.lias.bimedia2018machinelearning.preprocessing.controlers.TicketControl;
-import fr.ensma.lias.bimedia2018machinelearning.preprocessing.fileReadWrite.CSVUsage;
 import fr.ensma.lias.bimedia2018machinelearning.preprocessing.model.AssociationRule;
-import fr.ensma.lias.bimedia2018machinelearning.preprocessing.model.Result;
-
-
 
 /**
  * @author IDDIR Lotfi
- *
  */
 public class App 
 {
 	public static void main( String[] args ) 
     {
+		@SuppressWarnings("unused")
 		TicketControl control = new TicketControl();
 		List<Integer> pdvs= new ArrayList<Integer>();
 		pdvs.add(350459);
@@ -139,7 +123,8 @@ public class App
 		pdvs.add(940267);
 		pdvs.add(940279);
      SparkConf conf = new SparkConf().setAppName("FP-growth Example").setMaster("local[*]");
-     JavaSparkContext sc = new JavaSparkContext(conf);
+     @SuppressWarnings("resource")
+	JavaSparkContext sc = new JavaSparkContext(conf);
 
       // $example on$
      for (int pdv : pdvs) {
@@ -150,13 +135,11 @@ public class App
  		
    		BufferedWriter bw = new BufferedWriter(fw,250000000);
    		bw.write("pdv;minsup;freq;minconf;nbrule");
-   		bw.newLine();
-    	 
+   		bw.newLine();	 
       JavaRDD<String> data = sc.textFile("C:\\Users\\ASUS\\Desktop\\ditinctProduct\\data\\data"+pdv+".txt");
       JavaRDD<List<String>> transactions = data.map(line -> Arrays.asList(line.split(";")));
       for (int i = 1;i<200;i=i+5)
       {
-    	
     	  double minsup = (double)(i)/1000;
 	      FPGrowth fpg = new FPGrowth()
 	        .setMinSupport(minsup)
@@ -196,8 +179,6 @@ public class App
 		  		bw.write(pdv+";"+minsup+";"+mean+";"+minConfidence+";"+rules.size());
 		  		bw.newLine();
 	      }
-	      
-		
       	}bw.close();
   		/*Result r = new Result();
   		 r.setRules(rules);*/

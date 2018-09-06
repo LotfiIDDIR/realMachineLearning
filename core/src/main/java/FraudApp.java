@@ -26,7 +26,6 @@ import fr.ensma.lias.bimedia2018machinelearning.preprocessing.model.Transaction;
 import fr.ensma.lias.bimedia2018machinelearning.preprocessing.model.TransactionMoneyGram;
 import fr.ensma.lias.bimedia2018machinelearning.preprocessing.model.TransactionPCS;
 
-
 /**
  * @author Lotfi IDDIR 
  */
@@ -55,6 +54,7 @@ public class FraudApp
     	Transaction t;
     	String folder=System.getProperty("user.dir");
     	folder+="/src/main/resources/";
+    	
     	try
     	{
     	    CommandLine line = parser.parse(options, args);
@@ -121,33 +121,26 @@ public class FraudApp
 	    }
    	    	controller.fillClusters(folder+"References/storesClustered.csv", ';');
     	    controller.persistLabeledPoints(folder+"Transaction"+transactionType+"/LabeledPoints"+min+transactionType+".csv", ';');
-  
-    	
+      	
     	//  Etape d'équilibrage		
-    	/*    FraudBalancer frb= new FraudBalancer();
+    	   FraudBalancer frb= new FraudBalancer();
     	    frb.balance(folder+"Transaction"+transactionType+"/LabeledPoints"+min+transactionType+".csv",';', finalRatio,context);
-    	   
-    	*/
-    		// Etape de génération
-        	
-        	/*GenerTransaction gener = new GenerTransaction();
-        	gener.increase("tmp/transformed"+debut+".csv",',', numDuplication);// ajouter indexCol et le contexte
-        	*/
-    		
+	
         // Etape d'apprentissage
     	    Classifier classifier;
-    	    String modelPath;
+    	    @SuppressWarnings("unused")
+			String modelPath;
     	    String path = "C:\\Users\\ASUS\\Desktop\\PFE\\Rapport\\Statistiques\\"+transactionType+"\\DecisionTree"+min+".csv";
     	    FileWriter fw = new FileWriter(path,true);
     		BufferedWriter bw = new BufferedWriter(fw,250000000);
+    		PredictionContext pContext = new PredictionContext();
     		
     	if (predictionModel.equals("DT"))
 	    {
     		bw.write("TrainingProportion;depth;error;precision;recall");
 			bw.newLine();
-    	    	classifier = new DecisionTreeClassifier("frauDetectionApp","local[*]");
-    	    	PredictionContext pContext = new PredictionContext();
-    	    	pContext.setClassifier(classifier);
+    	    classifier = new DecisionTreeClassifier("frauDetectionApp","local[*]");
+    	    pContext.setClassifier(classifier);
     	    /*	for(int k = 3;k<10;k++)
     	    	{
     	    		maxDepth = k;
@@ -172,8 +165,7 @@ public class FraudApp
 		classifier = new RandomForestClassifier("frauDetectionApp","local[*]");
 		bw.write("TrainingProportion;depth;numTrees;error;precision;recall");
 		bw.newLine();
-	    	PredictionContext pContext = new PredictionContext();
-	    	pContext.setClassifier(classifier);
+	    pContext.setClassifier(classifier);
 	    	/*for(int l=2;l<10;l++)
 	    	{
 	    		numTrees=l;
@@ -184,7 +176,7 @@ public class FraudApp
 	    	    	{
 	    	    		trainingSetPortion=(double)(j)/10;
 				    	*/
-				    		modelPath = ((RandomForestClassifier)classifier).train(folder+"Transaction"+transactionType+"/LabeledPoints"+min+transactionType+".csv",';',trainingSetPortion,maxDepth,map,2,context);
+				    		modelPath = ((RandomForestClassifier)classifier).train(folder+"Transaction"+transactionType+"/LabeledPoints"+min+transactionType+".csv",';',trainingSetPortion,maxDepth,map,numTrees,context);
 				    		String modelToDebug = classifier.getModelTodebug();
 				    		System.out.println("Le modele obtenu est le suivant :\n"+modelToDebug);
 				    		bw.write(trainingSetPortion+";"+maxDepth+";"+numTrees+";"+classifier.getTestError()+";"+classifier.getPrecision()+";"+classifier.getRappel());
@@ -198,10 +190,8 @@ public class FraudApp
 			bw.close();
         	
         //etape de prédiction
-    		
-    	/*   Predictor predictor = new Predictor("frauDetectionApp","local[*]");
-    	   predictor.predict(modelPath, "src/main/resources/data/test.csv", ',',context,pContext);
-    		*/
+    	Predictor predictor = new Predictor("frauDetectionApp","local[*]");
+    	predictor.predict(modelPath, "src/main/resources/data/test.csv", ',',context,pContext);
     	} catch (IOException e) {
     	    // TODO Auto-generated catch block
     	    e.printStackTrace();

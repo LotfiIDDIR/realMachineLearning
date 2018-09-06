@@ -6,7 +6,6 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -198,8 +197,6 @@ public class TransactionMoneyGram extends Transaction {
 		result+=separator;
 		result+=country;
 		result+=separator;
-	//	DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-	//	result+=dateformat.format(new Date(dateDebut.getTime())).toString();// Change the date format to write it directly as a timestamp
 		result+=Long.toString(dateDebut.getTime()%86400000);
 		result+=separator;
 		result+=Integer.toString(pdv);

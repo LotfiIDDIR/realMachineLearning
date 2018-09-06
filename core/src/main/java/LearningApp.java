@@ -82,7 +82,8 @@ public class LearningApp {
     	TransactionContext context = new TransactionContext(t);
     	
         Classifier classifier;
-	    String modelPath;
+	    @SuppressWarnings("unused")
+		String modelPath;
 	if (predictionModel.equals("DT"))
 	    {
 	    	classifier = new DecisionTreeClassifier("frauDetectionApp","local[*]");

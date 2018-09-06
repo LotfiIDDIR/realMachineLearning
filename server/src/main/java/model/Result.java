@@ -1,4 +1,4 @@
-package fr.ensma.lias.bimedia2018machinelearning.preprocessing.model;
+package fr.ensma.lias.bimedia2018machinelearning.model;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -9,9 +9,6 @@ import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import fr.ensma.lias.bimedia2018machinelearning.preprocessing.model.AssociationRule;
-
 
 public class Result {
 	

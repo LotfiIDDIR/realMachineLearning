@@ -1,4 +1,4 @@
-package fr.ensma.lias.bimedia2018machinelearning.preprocessing.model;
+package fr.ensma.lias.bimedia2018machinelearning.model;
 
 import java.util.List;
 
